@@ -6,7 +6,8 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // cargar rutas
-//var user_routes = require('./routes/user');
+var usuario_routes = require('./routes/usuario');
+var login_routes = require('./routes/login');
 //var activity_routes = require('./routes/activity');
 
 // middlewares de body-parser
@@ -24,13 +25,8 @@ app.use((req, res, next) => {
 });
 
 // rutas base
-app.get('/', (req, res, next) => {
-	res.status(200).json({
-		ok: true,
-		mensaje: 'Peticion realizada correctamente'
-	})
-});
-//app.use('/api', user_routes);
+app.use('/login', login_routes);
+app.use('/usuario', usuario_routes);
 //app.use('/api', activity_routes);
 
 module.exports = app;
