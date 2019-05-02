@@ -4,82 +4,87 @@ var bcrypt = require('bcryptjs');
 var moment = require('moment');
 
 //modelos
-var Usuario = require('../models/usuario');
+var Prestamo = require('../models/prestamo');
+
+// servicio jwt
+//var jwt = require('../services/jwt');
 
 //acciones
 //  ==================================================
-//  Obtener todos los usuarios
+//  Obtener todos los prestamos
 //  ==================================================
-function getUsers(req, res){
-
+function getPrestamos(req, res){
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    Usuario.find({  }, 'nombre email role')
+    Prestamo.find({  })
         .skip(desde)
         .limit(5)
         .exec( 
-            (err, usuarios) => {
+            (err, prestamos) => {
             if(err){
                 return res.status(500).json({
                     ok: false,
-                    mensaje: 'Error cargando usuario',
+                    mensaje: 'Error cargando prestamo',
                     errors: err
                 });
             }
 
-            Usuario.count({}, (err, conteo)=>{
+            Prestamo.count({}, (err, conteo)=>{
                 res.status(200).json({
                     ok: true,
-                    usuarios: usuarios,
-                    total: conteo
+                    prestamos: prestamos,
+                    conteo: conteo
                 });
             });
     });    
 }
 
 //  ==================================================
-//  Actualizar usuario
+//  Actualizar prestamo
 //  ==================================================
-function updateUsuario(req, res){
+function updatePrestamo(req, res){
     var id = req.params.id;
     var body = req.body;
 
-    Usuario.findById(id, (err, usuario) =>{
+    Prestamo.findById(id, (err, prestamo) =>{
         if(err){
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al buscar usuario',
+                mensaje: 'Error al buscar prestamo',
                 errors: err
             });
         }
 
-        if(!usuario){
+        if(!prestamo){
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El usuario con el id '+ id + ' no existe',
-                errors: { message: 'No existe un usuario con ese ID' }
+                mensaje: 'El prestamo con el id '+ id + ' no existe',
+                errors: { message: 'No existe un prestamo con ese ID' }
             });
         }
 
-        usuario.nombre = body.nombre;
-        usuario.email = body.email;
-        usuario.role = body.role;
+        prestamo.nombre = body.nombre;
+        prestamo.cuentaEstudiante = body.cuentaEstudiante;
+        prestamo.grupo = body.grupo;
+        prestamo.carrera = body.carrera;
+        prestamo.fechaSalida = body.fechaSalida;
+        prestamo.status = body.status;
 
-        usuario.save((err, usuarioGuardado) => {
+        prestamo.save((err, prestamoGuardado) => {
             if(err){
                 return res.status(400).json({
                     ok: false,
-                    mensaje: 'Error al actualizar usuario',
+                    mensaje: 'Error al actualizar prestamo',
                     errors: err
                 });
             }
 
-            usuarioGuardado.password = '.';
+            prestamoGuardado.password = '.';
 
             res.status(200).json({
                 ok: true,
-                usuario: usuarioGuardado
+                prestamo: prestamoGuardado
             });
         });
 
@@ -87,71 +92,74 @@ function updateUsuario(req, res){
 }
 
 //  ==================================================
-//  Crear un nuevo usuario
+//  Crear un nuevo prestamo
 //  ==================================================
-function saveUsuario(req, res){
+function savePrestamo(req, res){
 
     // Recoger parametros peticion
     var body = req.body;
-
-    // Crea objeto de  usuario
-    var usuario = new Usuario({
+    var date = moment({});
+    
+    // Crea objeto de  prestamo
+    var prestamo = new Prestamo({
         nombre: body.nombre,
-        email: body.email,
-        password: bcrypt.hashSync(body.password, 10),
-        role: body.role
+        cuentaEstudiante: body.cuentaEstudiante,
+        grupo: body.grupo,
+        carrera: body.carrera,
+        fechaEntrada: moment(date).format('YYYY-MM-DD 00:00:00.000[Z]'),
+        status: 'A'
     });
 
-    // Guardar usuario en la BD
-    usuario.save((err, userStored) => {
+    // Guardar prestamo en la BD
+    prestamo.save((err, userStored) => {
         if(err){
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error al crear usuario',
+                mensaje: 'Error al crear prestamo',
                 errors: err
             });
         }
 
         res.status(201).json({
             ok: true,
-            usuario: userStored
+            prestamo: userStored
         });
     });
    
 }
 
 //  ==================================================
-//  Borrar un usuario
+//  Borrar un prestamo
 //  ==================================================
-function deleteUsuario (req, res)  {
+function deletePrestamo (req, res)  {
     var id = req.params.id;
 
-    Usuario.findByIdAndDelete(id, (err, usuarioBorrado) => {
+    Prestamo.findByIdAndDelete(id, (err, prestamoBorrado) => {
         if(err){
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al borrar usuario',
+                mensaje: 'Error al borrar prestamo',
                 errors: err
             });
         }
 
-        if(!usuarioBorrado){
+        if(!prestamoBorrado){
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe un usuario con ese id',
-                errors: { message: 'No existe un usuario con ese id'}
+                mensaje: 'No existe un prestamo con ese id',
+                errors: { message: 'No existe un prestamo con ese id'}
             });
         }
 
         res.status(200).json({
             ok: true,
-            usuario: usuarioBorrado
+            prestamo: prestamoBorrado
         });
     });
 }
 module.exports = {
-    getUsers,
-    saveUsuario,
-    updateUsuario,
-    deleteUsuario
+    getPrestamos,
+    savePrestamo,
+    updatePrestamo,
+    deletePrestamo
 };
