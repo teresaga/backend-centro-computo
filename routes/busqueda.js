@@ -8,6 +8,6 @@ var api = express.Router();
 var md_auth = require('../middleware/authenticated');
 
 api.get('/todo/:busqueda', BusquedaController.busquedaColeccion);
-api.get('/:tabla/:busqueda', BusquedaController.busquedaGeneral);
+api.get('/coleccion/:tabla/:busqueda', BusquedaController.busquedaGeneral);
 
 module.exports = api;
