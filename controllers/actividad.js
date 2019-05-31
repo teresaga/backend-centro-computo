@@ -19,7 +19,7 @@ function getActividades(req, res){
     Actividad.find({  })
         .populate({path: 'grupo'})
         .populate({path: 'carrera'})
-        .populate({path: 'servicio'})
+        .populate({path: 'tipoServicio'})
         .skip(desde)
         .limit(5)
         .exec( 
@@ -58,7 +58,7 @@ function getActividadesFechas(req, res){
         Actividad.find({$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}  )
             .populate({path: 'grupo'})
             .populate({path: 'carrera'})
-            .populate({path: 'servicio'})
+            .populate({path: 'tipoServicio'})
             .skip(desde)
             .limit(5)
             .exec( 
@@ -83,7 +83,7 @@ function getActividadesFechas(req, res){
         Actividad.find({tipoServicio: servicio ,$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}  )
             .populate({path: 'grupo'})
             .populate({path: 'carrera'})
-            .populate({path: 'servicio'})
+            .populate({path: 'tipoServicio'})
             .skip(desde)
             .limit(5)
             .exec( 
@@ -108,7 +108,7 @@ function getActividadesFechas(req, res){
         Actividad.find({estatus: estatus ,$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}  )
             .populate({path: 'grupo'})
             .populate({path: 'carrera'})
-            .populate({path: 'servicio'})
+            .populate({path: 'tipoServicio'})
             .skip(desde)
             .limit(5)
             .exec( 
