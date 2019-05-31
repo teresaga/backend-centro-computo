@@ -13,7 +13,7 @@ var actividad_routes = require('./routes/actividad');
 var prestamo_routes = require('./routes/prestamo');
 var detalle_prestamo_routes = require('./routes/detalle_prestamo');
 var busqueda_routes = require('./routes/busqueda');
-//var activity_routes = require('./routes/activity');
+var activity_routes = require('./routes/actividad');
 
 var carrera_routes = require('./routes/carrera');
 var grupo_routes = require('./routes/grupo');
@@ -42,7 +42,7 @@ app.use('/prestamo', prestamo_routes);
 app.use('/detalle-prestamo', detalle_prestamo_routes);
 app.use('/actividad', actividad_routes);
 app.use('/busqueda', busqueda_routes);
-//app.use('/api', activity_routes);
+app.use('/actividad', activity_routes);
 
 app.use('/carrera', carrera_routes);
 app.use('/grupo', grupo_routes);
