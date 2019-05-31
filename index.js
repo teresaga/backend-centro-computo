@@ -7,7 +7,8 @@ var port = process.env.PORT || 3000;
 mongoose.Promise = global.Promise;
 //mongodb://localhost:27017/vet_animal
 //mongodb://teresagalaviz:teresa1997@ds051665.mlab.com:51665/vet_animal
-mongoose.connect('mongodb://localhost:27017/centro_computo')
+//mongodb://teresagalaviz:teresa1997@ds363996.mlab.com:63996/centro_computo
+mongoose.connect('mongodb://teresagalaviz:teresa1997@ds363996.mlab.com:63996/centro_computo')
 	.then(() => {
 		console.log("La conexión a la base de datos centro de computo se ha realizado correctamente..");
 		

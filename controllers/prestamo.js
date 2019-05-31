@@ -18,6 +18,8 @@ function getPrestamos(req, res){
     desde = Number(desde);
 
     Prestamo.find({  })
+        .populate({path: 'grupo'})
+        .populate({path: 'carrera'})
         .skip(desde)
         .limit(5)
         .exec( 
@@ -31,6 +33,69 @@ function getPrestamos(req, res){
             }
 
             Prestamo.count({}, (err, conteo)=>{
+                res.status(200).json({
+                    ok: true,
+                    prestamos: prestamos,
+                    conteo: conteo
+                });
+            });
+    });    
+}
+
+//  ==================================================
+//  Busqueda prestamos por fecha registro
+//  ==================================================
+function getPrestamosFecha(req, res){
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+    var datestart = req.query.datestart;
+    var dateend = req.query.dateend;
+
+    Prestamo.find({$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]})
+        .populate({path: 'grupo'})
+        .populate({path: 'carrera'})
+        .skip(desde)
+        .limit(5)
+        .exec( 
+            (err, prestamos) => {
+            if(err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando prestamo',
+                    errors: err
+                });
+            }
+
+            Prestamo.count({$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}, (err, conteo)=>{
+                res.status(200).json({
+                    ok: true,
+                    prestamos: prestamos,
+                    conteo: conteo
+                });
+            });
+    });    
+}
+
+//  ==================================================
+//  Busqueda prestamos por fecha registro
+//  ==================================================
+function getPrestamosEstado(req, res){
+    var estatus = req.query.estatus;
+
+    Prestamo.find({ estatus: estatus})
+        .populate({path: 'grupo'})
+        .populate({path: 'carrera'})
+        .exec( 
+            (err, prestamos) => {
+            if(err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando prestamo',
+                    errors: err
+                });
+            }
+
+            Prestamo.count({ estatus: estatus }, (err, conteo)=>{
                 res.status(200).json({
                     ok: true,
                     prestamos: prestamos,
@@ -69,7 +134,7 @@ function updatePrestamo(req, res){
         prestamo.grupo = body.grupo;
         prestamo.carrera = body.carrera;
         prestamo.fechaSalida = body.fechaSalida;
-        prestamo.status = body.status;
+        prestamo.estatus = body.estatus;
 
         prestamo.save((err, prestamoGuardado) => {
             if(err){
@@ -107,7 +172,7 @@ function savePrestamo(req, res){
         grupo: body.grupo,
         carrera: body.carrera,
         fechaEntrada: moment(date).format('YYYY-MM-DD 00:00:00.000[Z]'),
-        status: 'A'
+        estatus: 'A'
     });
 
     // Guardar prestamo en la BD
@@ -159,6 +224,8 @@ function deletePrestamo (req, res)  {
 }
 module.exports = {
     getPrestamos,
+    getPrestamosEstado,
+    getPrestamosFecha,
     savePrestamo,
     updatePrestamo,
     deletePrestamo

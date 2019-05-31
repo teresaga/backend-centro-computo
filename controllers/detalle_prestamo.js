@@ -9,12 +9,11 @@ var DetallePrestamo = require('../models/detalle_prestamo');
 //  Obtener todos los detallesPrestamos
 //  ==================================================
 function getDetallePrestamos(req, res){
-    var desde = req.query.desde || 0;
-    desde = Number(desde);
+    var prestamo = req.query.prestamo;
 
-    DetallePrestamo.find({  })
-        .skip(desde)
-        .limit(5)
+    DetallePrestamo.find({ prestamo: prestamo })
+        .populate({path: 'prestamo'})
+        .populate({path: 'inventario'})
         .exec( 
             (err, detallesPrestamos) => {
             if(err){
@@ -43,10 +42,9 @@ function saveDetallePrestamo(req, res){
 
     // Recoger parametros peticion
     var body = req.body;
-    var date = moment({});
     
     // Crea objeto de  detallesPrestamo
-    var detallesPrestamo = new Prestamo({
+    var detallesPrestamo = new DetallePrestamo({
         prestamo: body.prestamo,
         inventario: body.inventario
     });

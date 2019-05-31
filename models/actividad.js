@@ -11,9 +11,9 @@ var estadosValidos = {
 var actividadesSchema = Schema({
     nombre: { type: String, required: [true, 'El nombre es necesario'] },
     cuentaEstudiante: { type: String, required: false },
-    grupo: { type: String, required: false },
-    carrera: { type: String, required: false },
-    tipoServicio: { type: String, required: [true, 'El tipo de servicio es necesario'] },
+    grupo: { type: Schema.ObjectId, ref: 'Grupo', required: false },
+    carrera: { type: Schema.ObjectId, ref: 'Carrera', required: false },
+    tipoServicio: { type: Schema.ObjectId, ref: 'Servicio', required: [true, 'El tipo de servicio es necesario'] },
     equipo: { type:String, required: false },
     marca: { type:String, required: false },
     color: { type:String, required: false },
