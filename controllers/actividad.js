@@ -43,6 +43,96 @@ function getActividades(req, res){
 }
 
 //  ==================================================
+//  Obtener todos los actividades por fecha de registro
+//  ==================================================
+function getActividadesFechas(req, res){
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+    var tipo = req.query.tipo || 0;
+    var servicio = req.query.servicio;
+    var estatus = req.query.estatus;
+    var datestart = req.query.datestart;
+    var dateend = req.query.dateend;
+
+    if (tipo == 0){
+        Actividad.find({$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}  )
+            .populate({path: 'grupo'})
+            .populate({path: 'carrera'})
+            .populate({path: 'servicio'})
+            .skip(desde)
+            .limit(5)
+            .exec( 
+                (err, actividades) => {
+                if(err){
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando actividad',
+                        errors: err
+                    });
+                }
+
+                Actividad.count({$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}, (err, conteo)=>{
+                    res.status(200).json({
+                        ok: true,
+                        actividades: actividades,
+                        conteo: conteo
+                    });
+                });
+        });    
+    }else if (tipo==1){
+        Actividad.find({tipoServicio: servicio ,$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}  )
+            .populate({path: 'grupo'})
+            .populate({path: 'carrera'})
+            .populate({path: 'servicio'})
+            .skip(desde)
+            .limit(5)
+            .exec( 
+                (err, actividades) => {
+                if(err){
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando actividad',
+                        errors: err
+                    });
+                }
+
+                Actividad.count({tipoServicio: servicio, $and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}, (err, conteo)=>{
+                    res.status(200).json({
+                        ok: true,
+                        actividades: actividades,
+                        conteo: conteo
+                    });
+                });
+        });
+    }else if (tipo==2){
+        Actividad.find({estatus: estatus ,$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}  )
+            .populate({path: 'grupo'})
+            .populate({path: 'carrera'})
+            .populate({path: 'servicio'})
+            .skip(desde)
+            .limit(5)
+            .exec( 
+                (err, actividades) => {
+                if(err){
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando actividad',
+                        errors: err
+                    });
+                }
+
+                Actividad.count({estatus: estatus ,$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}, (err, conteo)=>{
+                    res.status(200).json({
+                        ok: true,
+                        actividades: actividades,
+                        conteo: conteo
+                    });
+                });
+        });
+    }
+}
+
+//  ==================================================
 //  Actualizar actividad
 //  ==================================================
 function updateActividad(req, res){
@@ -76,7 +166,7 @@ function updateActividad(req, res){
         actividad.color = body.color;
         actividad.fechaSalida = body.fechaSalida;
         actividad.observaciones = body.observaciones;
-        actividad.status = body.status;
+        actividad.estatus = body.estatus;
 
         actividad.save((err, actividadGuardado) => {
             if(err){
@@ -118,7 +208,7 @@ function saveActividad(req, res){
         marca: body.marca,
         color: body.color,
         fechaEntrada: moment(date).format('YYYY-MM-DD 00:00:00.000[Z]'),
-        status: 'A'
+        estatus: 'A'
     });
 
     // Guardar actividad en la BD
@@ -170,6 +260,7 @@ function deleteActividad (req, res)  {
 }
 module.exports = {
     getActividades,
+    getActividadesFechas,
     saveActividad,
     updateActividad,
     deleteActividad

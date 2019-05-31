@@ -8,6 +8,7 @@ var api = express.Router();
 var md_auth = require('../middleware/authenticated');
 
 api.get('/', ActividadController.getActividades);
+api.get('/fechas', ActividadController.getActividadesFechas);
 api.post('/', md_auth.ensureAuth, ActividadController.saveActividad);
 api.put('/:id', md_auth.ensureAuth, ActividadController.updateActividad);
 api.delete('/:id', md_auth.ensureAuth, ActividadController.deleteActividad);
