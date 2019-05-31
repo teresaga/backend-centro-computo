@@ -13,15 +13,11 @@ var Actividad = require('../models/actividad');
 //  Obtener todos los actividades
 //  ==================================================
 function getActividades(req, res){
-    var desde = req.query.desde || 0;
-    desde = Number(desde);
 
     Actividad.find({  })
         .populate({path: 'grupo'})
         .populate({path: 'carrera'})
         .populate({path: 'tipoServicio'})
-        .skip(desde)
-        .limit(5)
         .exec( 
             (err, actividades) => {
             if(err){
