@@ -129,6 +129,31 @@ function getActividadesFechas(req, res){
                     });
                 });
         });
+    }else if (tipo==3){
+        Actividad.find({tipoServicio: servicio,estatus: estatus ,$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}  )
+            .populate({path: 'grupo'})
+            .populate({path: 'carrera'})
+            .populate({path: 'tipoServicio'})
+            .skip(desde)
+            .limit(5)
+            .exec( 
+                (err, actividades) => {
+                if(err){
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando actividad',
+                        errors: err
+                    });
+                }
+
+                Actividad.count({tipoServicio: servicio, estatus: estatus ,$and: [ { fechaEntrada: { $gte: new Date(datestart) } }, { fechaEntrada: { $lte: new Date(dateend) } } ]}, (err, conteo)=>{
+                    res.status(200).json({
+                        ok: true,
+                        actividades: actividades,
+                        conteo: conteo
+                    });
+                });
+        });
     }
 }
 
