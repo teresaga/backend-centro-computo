@@ -15,6 +15,11 @@ var detalle_prestamo_routes = require('./routes/detalle_prestamo');
 var busqueda_routes = require('./routes/busqueda');
 //var activity_routes = require('./routes/activity');
 
+var carrera_routes = require('./routes/carrera');
+var grupo_routes = require('./routes/grupo');
+var servicio_routes = require('./routes/servicio');
+
+
 // middlewares de body-parser
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -38,5 +43,9 @@ app.use('/detalle-prestamo', detalle_prestamo_routes);
 app.use('/actividad', actividad_routes);
 app.use('/busqueda', busqueda_routes);
 //app.use('/api', activity_routes);
+
+app.use('/carrera', carrera_routes);
+app.use('/grupo', grupo_routes);
+app.use('/servicio', servicio_routes);
 
 module.exports = app;

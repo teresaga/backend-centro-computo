@@ -17,6 +17,9 @@ function getActividades(req, res){
     desde = Number(desde);
 
     Actividad.find({  })
+        .populate({path: 'grupo'})
+        .populate({path: 'carrera'})
+        .populate({path: 'servicio'})
         .skip(desde)
         .limit(5)
         .exec( 

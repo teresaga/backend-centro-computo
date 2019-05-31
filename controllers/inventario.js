@@ -6,10 +6,38 @@ var moment = require('moment');
 //modelos
 var Inventario = require('../models/inventario');
 
-// servicio jwt
-//var jwt = require('../services/jwt');
-
 //acciones
+//  ==================================================
+//  Obtener todos un objeto
+//  ==================================================
+function getInventario(req, res){
+    var id =  req.params.id;
+
+    Inventario.findById( id )
+            .exec( (err, inventario) => {
+                if(err){
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error al buscar inventario',
+                        errors: err
+                    });
+                }
+
+                if(!inventario){
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'El inventario con el id '+ id + ' no existe',
+                        errors: { message: 'No existe un inventario con ese ID' }
+                    });
+                }
+
+                res.status(200).json({
+                    ok: true,
+                    inventario: inventario
+                });
+            });
+}
+
 //  ==================================================
 //  Obtener todos los inventarios
 //  ==================================================
@@ -41,6 +69,32 @@ function getInventarios(req, res){
 }
 
 //  ==================================================
+//  Obtener todos los inventarios disponibles para prestamos
+//  ==================================================
+function getTodosInventarios(req, res){
+
+    Inventario.find({ $and: [ { estatus: 'D' }, { tipo: 'P' } ] })
+        .exec( 
+            (err, inventario) => {
+            if(err){
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error cargando inventarios',
+                    errors: err
+                });
+            }
+
+            Inventario.count({ $and: [ { estatus: 'D' }, { tipo: 'P' } ]}, (err, conteo)=>{
+                res.status(200).json({
+                    ok: true,
+                    inventario: inventario,
+                    total: conteo
+                });
+            });
+    });    
+}
+
+//  ==================================================
 //  Actualizar inventario
 //  ==================================================
 function updateInventario(req, res){
@@ -51,7 +105,7 @@ function updateInventario(req, res){
         if(err){
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al buscar inventario',
+                mensaje: 'Error al actualizar inventario',
                 errors: err
             });
         }
@@ -69,8 +123,9 @@ function updateInventario(req, res){
         inventario.serie = body.serie;
         inventario.localizacion = body.localizacion;
         inventario.personaAsignacion = body.personaAsignacion;
-        inventario.registerDate = body.registerDate;
         inventario.tipo = body.tipo;
+        inventario.estatus = body.estatus;
+        inventario.observaciones = body.observaciones;
 
         inventario.save((err, inventarioGuardado) => {
             if(err){
@@ -80,8 +135,6 @@ function updateInventario(req, res){
                     errors: err
                 });
             }
-
-            inventarioGuardado.password = '.';
 
             res.status(200).json({
                 ok: true,
@@ -99,6 +152,7 @@ function saveInventario(req, res){
 
     // Recoger parametros peticion
     var body = req.body;
+    var date = moment({});
 
     // Crea objeto de  inventario
     var inventario = new Inventario({
@@ -107,12 +161,14 @@ function saveInventario(req, res){
         serie: body.serie,
         localizacion: body.localizacion,
         personaAsignacion: body.personaAsignacion,
-        registerDate: body.registerDate,
-        tipo: body.tipo
+        fechaRegistro: moment(date).format('YYYY-MM-DD 00:00:00.000[Z]'),
+        tipo: body.tipo,
+        estatus: body.estatus,
+        observaciones: body.observaciones
     });
 
     // Guardar inventario en la BD
-    inventario.save((err, userStored) => {
+    inventario.save((err, inventarioStored) => {
         if(err){
             return res.status(400).json({
                 ok: false,
@@ -123,7 +179,7 @@ function saveInventario(req, res){
 
         res.status(201).json({
             ok: true,
-            inventario: userStored
+            inventario: inventarioStored
         });
     });
    
@@ -160,6 +216,8 @@ function deleteInventario (req, res)  {
 }
 module.exports = {
     getInventarios,
+    getTodosInventarios,
+    getInventario,
     saveInventario,
     updateInventario,
     deleteInventario

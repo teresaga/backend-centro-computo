@@ -8,6 +8,8 @@ var api = express.Router();
 var md_auth = require('../middleware/authenticated');
 
 api.get('/', PrestamoController.getPrestamos);
+api.get('/fecha', PrestamoController.getPrestamosFecha);
+api.get('/estado', PrestamoController.getPrestamosEstado);
 api.post('/', md_auth.ensureAuth, PrestamoController.savePrestamo);
 api.put('/:id', md_auth.ensureAuth, PrestamoController.updatePrestamo);
 api.delete('/:id', md_auth.ensureAuth, PrestamoController.deletePrestamo);

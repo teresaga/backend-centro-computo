@@ -8,6 +8,9 @@ var Usuario = require('../models/usuario');
 var Inventario = require('../models/inventario');
 var Prestamo = require('../models/prestamo');
 var Actividad = require('../models/actividad');
+var Carrera = require('../models/carrera');
+var Grupo = require('../models/grupo');
+var Servicio = require('../models/servicio');
 
 // servicio jwt
 //var jwt = require('../services/jwt');
@@ -34,6 +37,15 @@ function busquedaColeccion(req, res){
             break;
         case 'actividades':
             promesa = buscarActividades(busqueda, regex);
+            break;
+        case 'carreras':
+            promesa = buscarCarreras(busqueda, regex);
+            break;
+        case 'grupos':
+            promesa = buscarGrupos(busqueda, regex);
+            break;
+        case 'servicios':
+            promesa = buscarServicios(busqueda, regex);
             break;
         default:
             return res.status(400).json({
@@ -85,7 +97,7 @@ function buscarInventario(busqueda, regex) {
     return new Promise((resolve, reject) => {
 
         Inventario.find({ })
-            .or([{ 'descripcion': regex }, { 'modelo': regex }, { 'serie': regex }, { 'localizacion': regex }, { 'personaAsignacion': regex }])
+            .or([{ 'descripcion': regex }])
             .exec((err, inventario) => {
 
                 if (err) {
@@ -102,13 +114,15 @@ function buscarPrestamos(busqueda, regex) {
     return new Promise((resolve, reject) => {
 
         Prestamo.find({  })
-            .or([{ 'nombre': regex }, { 'cuentaEstudiante': regex }, { 'grupo': regex }, { 'carrera': regex }, { 'status': regex }])
-            .exec((err, prestamo) => {
+            .populate({path: 'carrera'})
+            .populate({path: 'grupo'})
+            .or([{ 'nombre': regex }, { 'cuentaEstudiante': regex } ])
+            .exec((err, prestamos) => {
 
                 if (err) {
-                    reject('Error al cargar prestamos', err);
+                    reject('Error al cargar préstamos', err);
                 } else {
-                    resolve(prestamo)
+                    resolve(prestamos)
                 }
             });
     });
@@ -119,7 +133,10 @@ function buscarActividades(busqueda, regex) {
     return new Promise((resolve, reject) => {
 
         Actividad.find({ })
-            .or([{ 'nombre': regex }, { 'cuentaEstudiante': regex }, { 'grupo': regex }, { 'carrera': regex }, { 'equipo': regex }, { 'marca': regex }, { 'color': regex }])
+            .populate({path: 'carrera'})
+            .populate({path: 'servicio'})
+            .populate({path: 'grupo'})
+            .or([{ 'nombre': regex }, { 'cuentaEstudiante': regex }, { 'equipo': regex }, { 'marca': regex }, { 'color': regex }])
             .exec((err, actividades) => {
 
                 if (err) {
@@ -150,6 +167,57 @@ function buscarUsuarios(busqueda, regex) {
             })
 
 
+    });
+}
+
+function buscarCarreras(busqueda, regex) {
+
+    return new Promise((resolve, reject) => {
+
+        Carrera.find({ })
+            .or([{ 'nombre': regex }])
+            .exec((err, carrera) => {
+
+                if (err) {
+                    reject('Error al cargar carrera', err);
+                } else {
+                    resolve(carrera)
+                }
+            });
+    });
+}
+
+function buscarGrupos(busqueda, regex) {
+
+    return new Promise((resolve, reject) => {
+
+        Grupo.find({ })
+            .or([{ 'nombre': regex }])
+            .exec((err, grupo) => {
+
+                if (err) {
+                    reject('Error al cargar grupo', err);
+                } else {
+                    resolve(grupo)
+                }
+            });
+    });
+}
+
+function buscarServicios(busqueda, regex) {
+
+    return new Promise((resolve, reject) => {
+
+        Servicio.find({ })
+            .or([{ 'nombre': regex }])
+            .exec((err, servicio) => {
+
+                if (err) {
+                    reject('Error al cargar servicio', err);
+                } else {
+                    resolve(servicio)
+                }
+            });
     });
 }
 
